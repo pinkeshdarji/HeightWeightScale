@@ -43,58 +43,74 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
             Container(
               width: 90,
               decoration: BoxDecoration(color: Colors.tealAccent[200]),
-              child: ListView.builder(
-                controller: _controller,
-                itemCount: measurementLineList.length,
-                padding: EdgeInsets.only(
-                    left: 30, top: MediaQuery.of(context).size.height * 0.5),
-                itemBuilder: (context, index) {
-                  final mLine = measurementLineList[index];
+              child: Row(
+                children: <Widget>[
+                  RotatedBox(
+                    quarterTurns: 1,
+                    child: Image.asset(
+                      'assets/images/tooltip.png',
+                      scale: 1,
+                    ),
+                  ),
+                  Expanded(
+                      child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    controller: _controller,
+                    itemCount: measurementLineList.length,
+                    padding: EdgeInsets.only(
+                        left: 5,
+                        top: MediaQuery.of(context).size.height * 0.465),
+                    itemBuilder: (context, index) {
+                      final mLine = measurementLineList[index];
 
-                  if (mLine.type == Line.big) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3.5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            '${mLine.value}',
-                            style: TextStyle(fontSize: 20),
+                      if (mLine.type == Line.big) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 3.5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                '${mLine.value}',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              Container(
+                                height: 3,
+                                width: 30,
+                                decoration:
+                                    BoxDecoration(color: Colors.black54),
+                              )
+                            ],
                           ),
-                          Container(
-                            height: 3,
-                            width: 30,
-                            decoration: BoxDecoration(color: Colors.black54),
-                          )
-                        ],
-                      ),
-                    );
-                  } else if (measurementLineList[index].type == Line.small) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 7),
-                          height: 1,
-                          width: 20,
-                          decoration: BoxDecoration(color: Colors.blueGrey),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 6.5),
-                          height: 2,
-                          width: 30,
-                          decoration: BoxDecoration(color: Colors.black54),
-                        ),
-                      ],
-                    );
-                  }
-                },
+                        );
+                      } else if (measurementLineList[index].type ==
+                          Line.small) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 7),
+                              height: 1,
+                              width: 20,
+                              decoration: BoxDecoration(color: Colors.blueGrey),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 6.5),
+                              height: 2,
+                              width: 30,
+                              decoration: BoxDecoration(color: Colors.black54),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ))
+                ],
               ),
             )
           ],
