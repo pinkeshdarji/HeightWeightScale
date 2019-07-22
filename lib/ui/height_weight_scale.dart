@@ -64,23 +64,36 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                     itemCount: measurementLineList.length,
                     padding: EdgeInsets.only(
                         left: 5,
-                        top: MediaQuery.of(context).size.height * 0.465),
+                        top: MediaQuery.of(context).size.height * 0.46),
                     itemBuilder: (context, index) {
                       final mLine = measurementLineList[index];
 
                       if (mLine.type == Line.big) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                        return Stack(
+                          alignment: AlignmentDirectional.bottomEnd,
+                          overflow: Overflow.visible,
                           children: <Widget>[
-                            Text(
-                              '${mLine.value}',
-                              style: TextStyle(fontSize: 20),
+                            Positioned(
+                              top: 7,
+                              left: 0,
+                              child: Text(
+                                '${mLine.value}',
+                                style: TextStyle(fontSize: 20),
+                              ),
                             ),
-                            Container(
-                              height: 3,
-                              width: 30,
-                              decoration: BoxDecoration(color: Colors.black54),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 17,
+                                ),
+                                Container(
+                                  height: 3,
+                                  width: 30,
+                                  decoration:
+                                      BoxDecoration(color: Colors.black54),
+                                ),
+                              ],
                             )
                           ],
                         );
@@ -108,8 +121,8 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                             ),
                             Container(
                               height: 2,
-                              width: 20,
-                              decoration: BoxDecoration(color: Colors.blueGrey),
+                              width: 30,
+                              decoration: BoxDecoration(color: Colors.black54),
                             ),
                           ],
                         );
