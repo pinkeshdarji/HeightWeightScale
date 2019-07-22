@@ -38,7 +38,12 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Text('jhi'),
+              child: Center(
+                child: Text(
+                  'Height is 13',
+                  style: TextStyle(fontSize: 30),
+                ),
+              ),
             ),
             Container(
               width: 90,
@@ -122,7 +127,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   void _fillData() {
     for (int i = 0; i <= 13; i++) {
       measurementLineList.add(MeasurementLine(type: Line.big, value: i));
-      for (int j = 0; j <= 11; j++) {
+      for (int j = 0; j <= 10; j++) {
         measurementLineList.add(j != 5
             ? MeasurementLine(type: Line.small, value: i)
             : MeasurementLine(type: Line.medium, value: i));
