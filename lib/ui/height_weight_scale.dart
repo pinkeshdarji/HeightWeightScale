@@ -74,11 +74,11 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                           overflow: Overflow.visible,
                           children: <Widget>[
                             Positioned(
-                              top: 7,
+                              top: 4,
                               left: 0,
                               child: Text(
                                 '${mLine.value}',
-                                style: TextStyle(fontSize: 20),
+                                style: TextStyle(fontSize: 25),
                               ),
                             ),
                             Column(
