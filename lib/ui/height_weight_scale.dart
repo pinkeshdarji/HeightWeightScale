@@ -69,31 +69,30 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                       final mLine = measurementLineList[index];
 
                       if (mLine.type == Line.big) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3.5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                '${mLine.value}',
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              Container(
-                                height: 3,
-                                width: 30,
-                                decoration:
-                                    BoxDecoration(color: Colors.black54),
-                              )
-                            ],
-                          ),
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Text(
+                              '${mLine.value}',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            Container(
+                              height: 3,
+                              width: 30,
+                              decoration: BoxDecoration(color: Colors.black54),
+                            )
+                          ],
                         );
                       } else if (measurementLineList[index].type ==
                           Line.small) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
+                            SizedBox(
+                              height: 19,
+                            ),
                             Container(
-                              margin: EdgeInsets.symmetric(vertical: 7),
                               height: 1,
                               width: 20,
                               decoration: BoxDecoration(color: Colors.blueGrey),
@@ -101,14 +100,16 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                           ],
                         );
                       } else {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
+                            SizedBox(
+                              height: 18,
+                            ),
                             Container(
-                              margin: EdgeInsets.symmetric(vertical: 6.5),
                               height: 2,
-                              width: 30,
-                              decoration: BoxDecoration(color: Colors.black54),
+                              width: 20,
+                              decoration: BoxDecoration(color: Colors.blueGrey),
                             ),
                           ],
                         );
