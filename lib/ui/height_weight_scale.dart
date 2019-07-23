@@ -12,19 +12,14 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   List<MeasurementLine> measurementLineList = List<MeasurementLine>();
   final feetController = TextEditingController();
   final inchController = TextEditingController();
-
-  _scrollListener() {
-    debugPrint('${_controller.offset}');
-    _convertToinch(_controller.offset.toInt());
-  }
+  final feetScale = 13;
 
   @override
   void initState() {
     super.initState();
+    _fillData();
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
-    //feetController.addListener(_printLatestValue);
-    _fillData();
   }
 
   @override
@@ -84,6 +79,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                               hintText: '0',
                               suffixText: 'in',
                               border: OutlineInputBorder()),
+                          onSubmitted: _changeScale(),
                         ),
                       ),
                     ],
@@ -189,8 +185,14 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     );
   }
 
+  /// Methods
+  _scrollListener() {
+    debugPrint('${_controller.offset}');
+    _convertPixelToFeetAndInchAndReflectOnTextForm(_controller.offset.toInt());
+  }
+
   void _fillData() {
-    for (int i = 0; i <= 13; i++) {
+    for (int i = 0; i <= feetScale; i++) {
       measurementLineList.add(MeasurementLine(type: Line.big, value: i));
       for (int j = 0; j <= 10; j++) {
         measurementLineList.add(j != 5
@@ -200,7 +202,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     }
   }
 
-  void _convertToinch(int value) {
+  void _convertPixelToFeetAndInchAndReflectOnTextForm(int value) {
     int inch = value ~/ 20;
     int feet = inch ~/ 12;
     int actualInches = inch % 12;
