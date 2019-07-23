@@ -68,7 +68,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                               hintText: '0',
                               suffixText: 'ft',
                               border: OutlineInputBorder()),
-                          onSubmitted: _printLatestValue(),
+                          onSubmitted: _changeScale(),
                         ),
                       ),
                       SizedBox(
@@ -95,12 +95,17 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
               width: 90,
               decoration: BoxDecoration(color: Colors.tealAccent[200]),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  RotatedBox(
-                    quarterTurns: 1,
-                    child: Image.asset(
-                      'assets/images/tooltip.png',
-                      scale: 1,
+                  Container(
+                    margin: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.46),
+                    child: RotatedBox(
+                      quarterTurns: 1,
+                      child: Image.asset(
+                        'assets/images/tooltip.png',
+                        scale: 1,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -204,10 +209,14 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     inchController.text = actualInches.toString();
   }
 
-  _printLatestValue() {
-//    double moveTo = double.tryParse(feetController.text) ?? 0;
-//    _controller ??
-//        _controller.animateTo(moveTo,
-//            duration: Duration(milliseconds: 1000), curve: ElasticInCurve());
+  _changeScale() {
+    double moveToFeet = double.tryParse(feetController.text) ?? 0;
+    double moveToInch = double.tryParse(inchController.text) ?? 0;
+    double moveToPixel = moveToFeet * 240 + moveToInch * 20;
+    debugPrint('$moveToPixel');
+    if (_controller.hasClients) {
+      _controller.animateTo(moveToPixel,
+          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
+    }
   }
 }
