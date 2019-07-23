@@ -10,17 +10,20 @@ class HeightWeightScalePage extends StatefulWidget {
 class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   ScrollController _controller;
   List<MeasurementLine> measurementLineList = List<MeasurementLine>();
+  final feetController = TextEditingController();
+  final inchController = TextEditingController();
 
   _scrollListener() {
     debugPrint('${_controller.offset}');
+    _convertToinch(_controller.offset.toInt());
   }
 
   @override
   void initState() {
     super.initState();
-    _controller = ScrollController(initialScrollOffset: -100);
+    _controller = ScrollController();
     _controller.addListener(_scrollListener);
-
+    //feetController.addListener(_printLatestValue);
     _fillData();
   }
 
@@ -28,6 +31,8 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   void dispose() {
     _controller.removeListener(_scrollListener);
     _controller.dispose();
+    feetController.dispose();
+    inchController.dispose();
     super.dispose();
   }
 
@@ -38,11 +43,52 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Center(
-                child: Text(
-                  'Height is 13',
-                  style: TextStyle(fontSize: 30),
-                ),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 50,
+                  ),
+                  Text(
+                    'Height',
+                    style: TextStyle(fontSize: 30),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        width: 100,
+                        child: TextField(
+                          controller: feetController,
+                          style: TextStyle(fontSize: 22),
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              hintText: '0',
+                              suffixText: 'ft',
+                              border: OutlineInputBorder()),
+                          onSubmitted: _printLatestValue(),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Container(
+                        width: 100,
+                        child: TextField(
+                          controller: inchController,
+                          style: TextStyle(fontSize: 22),
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              hintText: '0',
+                              suffixText: 'in',
+                              border: OutlineInputBorder()),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
             Container(
@@ -147,5 +193,21 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
             : MeasurementLine(type: Line.medium, value: i));
       }
     }
+  }
+
+  void _convertToinch(int value) {
+    int inch = value ~/ 20;
+    int feet = inch ~/ 12;
+    int actualInches = inch % 12;
+    debugPrint('${feet} feet and ${actualInches} inch long');
+    feetController.text = feet.toString();
+    inchController.text = actualInches.toString();
+  }
+
+  _printLatestValue() {
+//    double moveTo = double.tryParse(feetController.text) ?? 0;
+//    _controller ??
+//        _controller.animateTo(moveTo,
+//            duration: Duration(milliseconds: 1000), curve: ElasticInCurve());
   }
 }
