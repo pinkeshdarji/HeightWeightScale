@@ -2,37 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:height_weight_scale/model/measurement_line.dart';
 
+import 'height_scale.dart';
+
 class HeightWeightScalePage extends StatefulWidget {
   @override
   _HeightWeightScalePageState createState() => _HeightWeightScalePageState();
 }
 
 class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
-  ScrollController _heightController;
   ScrollController _weightController;
-  List<MeasurementLine> heightMeasurementLineList = List<MeasurementLine>();
+
   List<MeasurementLine> weightMeasurementLineList = List<MeasurementLine>();
   final feetController = TextEditingController();
   final inchController = TextEditingController();
   final kilogramController = TextEditingController();
-  final heightLimitInFeet = 13;
   final weightLimitInKg = 200;
+
+  double feetValue = 0;
+  double inchValue = 0;
 
   @override
   void initState() {
     super.initState();
-    _fillDataForHeight();
     _fillDataForWeight();
-    _heightController = ScrollController(initialScrollOffset: 0);
-    _heightController.addListener(_heightScrollListener);
     _weightController = ScrollController(initialScrollOffset: 0);
     _weightController.addListener(_weightScrollListener);
   }
 
   @override
   void dispose() {
-    _heightController.removeListener(_heightScrollListener);
-    _heightController.dispose();
     _weightController.removeListener(_weightScrollListener);
     _weightController.dispose();
     feetController.dispose();
@@ -225,98 +223,12 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                 ],
               ),
             ),
-            Container(
-              width: 90,
-              decoration: BoxDecoration(color: Colors.tealAccent[200]),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(
-                        top: MediaQuery.of(context).size.height * 0.46),
-                    child: RotatedBox(
-                      quarterTurns: 1,
-                      child: Image.asset(
-                        'assets/images/tooltip.png',
-                        scale: 1,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                      child: ListView.builder(
-                    physics: BouncingScrollPhysics(),
-                    controller: _heightController,
-                    itemCount: heightMeasurementLineList.length,
-                    padding: EdgeInsets.only(
-                        left: 5,
-                        top: MediaQuery.of(context).size.height * 0.46),
-                    itemBuilder: (context, index) {
-                      final mLine = heightMeasurementLineList[index];
-
-                      if (mLine.type == Line.big) {
-                        return Stack(
-                          alignment: AlignmentDirectional.bottomEnd,
-                          overflow: Overflow.visible,
-                          children: <Widget>[
-                            Positioned(
-                              top: 4,
-                              left: 0,
-                              child: Text(
-                                '${mLine.value}',
-                                style: TextStyle(fontSize: 25),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 17,
-                                ),
-                                Container(
-                                  height: 3,
-                                  width: 30,
-                                  decoration:
-                                      BoxDecoration(color: Colors.black54),
-                                ),
-                              ],
-                            )
-                          ],
-                        );
-                      } else if (heightMeasurementLineList[index].type ==
-                          Line.small) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            SizedBox(
-                              height: 19,
-                            ),
-                            Container(
-                              height: 1,
-                              width: 20,
-                              decoration: BoxDecoration(color: Colors.blueGrey),
-                            ),
-                          ],
-                        );
-                      } else {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            SizedBox(
-                              height: 18,
-                            ),
-                            Container(
-                              height: 2,
-                              width: 30,
-                              decoration: BoxDecoration(color: Colors.black54),
-                            ),
-                          ],
-                        );
-                      }
-                    },
-                  ))
-                ],
-              ),
-            )
+            HeightScale(
+              heightLimitInFeet: 15,
+              //feet: feetValue,
+              //inch: inchValue,
+              onChanged: _handleHeightScaleChanged,
+            ),
           ],
         ),
       ),
@@ -324,17 +236,6 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   }
 
   /// Methods
-
-  void _fillDataForHeight() {
-    for (int i = 0; i <= heightLimitInFeet; i++) {
-      heightMeasurementLineList.add(MeasurementLine(type: Line.big, value: i));
-      for (int j = 0; j <= 10; j++) {
-        heightMeasurementLineList.add(j != 5
-            ? MeasurementLine(type: Line.small, value: i)
-            : MeasurementLine(type: Line.medium, value: i));
-      }
-    }
-  }
 
   void _fillDataForWeight() {
     for (int i = 0; i <= weightLimitInKg; i++) {
@@ -347,24 +248,9 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     }
   }
 
-  _heightScrollListener() {
-    debugPrint('${_heightController.offset}');
-    _heightConvertPixelToFeetAndInchAndReflectOnTextForm(
-        _heightController.offset.toInt());
-  }
-
   _weightScrollListener() {
     debugPrint('${_weightController.offset}');
     _weightConvertPixelToKgReflectOnTextForm(_weightController.offset.toInt());
-  }
-
-  _heightConvertPixelToFeetAndInchAndReflectOnTextForm(int value) {
-    int inchOffest = value ~/ 20;
-    int feet = inchOffest ~/ 12;
-    int inch = inchOffest % 12;
-    debugPrint('${feet} feet and ${inch} inch long');
-    feetController.text = feet.toString();
-    inchController.text = inch.toString();
   }
 
   _weightConvertPixelToKgReflectOnTextForm(int value) {
@@ -374,14 +260,19 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   }
 
   _heightChangeScale() {
-    double moveToFeet = double.tryParse(feetController.text) ?? 0;
-    double moveToInch = double.tryParse(inchController.text) ?? 0;
-    double moveToPixel = moveToFeet * 240 + moveToInch * 20;
-    debugPrint('$moveToPixel');
-    if (_heightController.hasClients) {
-      _heightController.animateTo(moveToPixel,
-          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
-    }
+    setState(() {
+      feetValue = double.tryParse(feetController.text) ?? 0;
+      inchValue = double.tryParse(inchController.text) ?? 0;
+    });
+
+//    double moveToFeet = double.tryParse(feetController.text) ?? 0;
+//    double moveToInch = double.tryParse(inchController.text) ?? 0;
+//    double moveToPixel = moveToFeet * 240 + moveToInch * 20;
+//    debugPrint('$moveToPixel');
+//    if (_heightController.hasClients) {
+//      _heightController.animateTo(moveToPixel,
+//          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
+//    }
   }
 
   _weightChangeScale() {
@@ -392,5 +283,12 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
       _weightController.animateTo(moveToPixel,
           duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
     }
+  }
+
+  void _handleHeightScaleChanged(int feet, int inch) {
+    setState(() {
+      feetController.text = feet.toString();
+      inchController.text = inch.toString();
+    });
   }
 }
