@@ -11,7 +11,7 @@ class HeightWeightScalePage extends StatefulWidget {
 
 class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   ScrollController _weightController;
-
+  ScrollController _heightController;
   List<MeasurementLine> weightMeasurementLineList = List<MeasurementLine>();
   final feetController = TextEditingController();
   final inchController = TextEditingController();
@@ -26,6 +26,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     super.initState();
     _fillDataForWeight();
     _weightController = ScrollController(initialScrollOffset: 0);
+    _heightController = ScrollController(initialScrollOffset: 0);
     _weightController.addListener(_weightScrollListener);
   }
 
@@ -75,7 +76,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                                     hintText: '0',
                                     suffixText: 'ft',
                                     border: OutlineInputBorder()),
-                                onSubmitted: _heightChangeScale(),
+                                //onSubmitted: _heightChangeScale(),
                               ),
                             ),
                             SizedBox(
@@ -91,10 +92,14 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                                     hintText: '0',
                                     suffixText: 'in',
                                     border: OutlineInputBorder()),
-                                onSubmitted: _heightChangeScale(),
+                                //onSubmitted: _heightChangeScale(),
                               ),
                             ),
                           ],
+                        ),
+                        RaisedButton(
+                          onPressed: _heightChangeScale,
+                          child: Text('set height'),
                         ),
                         SizedBox(
                           height: 50,
@@ -225,8 +230,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
             ),
             HeightScale(
               heightLimitInFeet: 15,
-              //feet: feetValue,
-              //inch: inchValue,
+              heightController: _heightController,
               onChanged: _handleHeightScaleChanged,
             ),
           ],
@@ -260,19 +264,14 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   }
 
   _heightChangeScale() {
-    setState(() {
-      feetValue = double.tryParse(feetController.text) ?? 0;
-      inchValue = double.tryParse(inchController.text) ?? 0;
-    });
-
-//    double moveToFeet = double.tryParse(feetController.text) ?? 0;
-//    double moveToInch = double.tryParse(inchController.text) ?? 0;
-//    double moveToPixel = moveToFeet * 240 + moveToInch * 20;
-//    debugPrint('$moveToPixel');
-//    if (_heightController.hasClients) {
-//      _heightController.animateTo(moveToPixel,
-//          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
-//    }
+    double moveToFeet = double.tryParse(feetController.text) ?? 0;
+    double moveToInch = double.tryParse(inchController.text) ?? 0;
+    double moveToPixel = moveToFeet * 240 + moveToInch * 20;
+    debugPrint('$moveToPixel');
+    if (_heightController.hasClients) {
+      _heightController.animateTo(moveToPixel,
+          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
+    }
   }
 
   _weightChangeScale() {
@@ -286,6 +285,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   }
 
   void _handleHeightScaleChanged(int feet, int inch) {
+    debugPrint('hi');
     setState(() {
       feetController.text = feet.toString();
       inchController.text = inch.toString();

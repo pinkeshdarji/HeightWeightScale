@@ -5,16 +5,14 @@ typedef void ScaleChangedCallback(int feet, int inch);
 
 class HeightScale extends StatefulWidget {
   final int heightLimitInFeet;
+  final ScrollController heightController;
   final ScaleChangedCallback onChanged;
-  final double feet;
-  final double inch;
 
   const HeightScale({
     Key key,
     @required this.heightLimitInFeet,
+    @required this.heightController,
     @required this.onChanged,
-    double this.feet = 0,
-    double this.inch = 0,
   }) : super(key: key);
 
   @override
@@ -22,21 +20,19 @@ class HeightScale extends StatefulWidget {
 }
 
 class _HeightScaleState extends State<HeightScale> {
-  ScrollController _heightController;
   List<MeasurementLine> heightMeasurementLineList = List<MeasurementLine>();
 
   @override
   void initState() {
     super.initState();
     _fillDataForHeight();
-    _heightController = ScrollController(initialScrollOffset: 0);
-    _heightController.addListener(_heightScrollListener);
+    widget.heightController.addListener(_heightScrollListener);
   }
 
   @override
   void dispose() {
-    _heightController.removeListener(_heightScrollListener);
-    _heightController.dispose();
+    widget.heightController.removeListener(_heightScrollListener);
+    widget.heightController.dispose();
     super.dispose();
   }
 
@@ -62,7 +58,7 @@ class _HeightScaleState extends State<HeightScale> {
           Expanded(
               child: ListView.builder(
             physics: BouncingScrollPhysics(),
-            controller: _heightController,
+            controller: widget.heightController,
             itemCount: heightMeasurementLineList.length,
             padding: EdgeInsets.only(
                 left: 5, top: MediaQuery.of(context).size.height * 0.46),
@@ -144,24 +140,24 @@ class _HeightScaleState extends State<HeightScale> {
   }
 
   _heightScrollListener() {
-    debugPrint('${_heightController.offset}');
+    debugPrint('${widget.heightController.offset}');
     _heightConvertPixelToFeetAndInchAndReflectOnTextForm(
-        _heightController.offset.toInt());
+        widget.heightController.offset.toInt());
   }
 
   _heightConvertPixelToFeetAndInchAndReflectOnTextForm(int value) {
     int inchOffest = value ~/ 20;
     int feet = inchOffest ~/ 12;
     int inch = inchOffest % 12;
-    //debugPrint('${feet} feet and ${inch} inch long');
+    debugPrint('${feet} feet and ${inch} inch long');
     widget.onChanged(feet, inch);
   }
 
-  _moveScaleTo() {
-    double moveToPixel = widget.feet * 240 + widget.inch * 20;
-    if (_heightController.hasClients) {
-      _heightController.animateTo(moveToPixel,
-          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
-    }
-  }
+//  _moveScaleTo() {
+//    double moveToPixel = widget.feet * 240 + widget.inch * 20;
+//    if (widget.heightController.hasClients) {
+//      widget.heightController.animateTo(moveToPixel,
+//          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
+//    }
+//  }
 }
