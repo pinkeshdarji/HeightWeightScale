@@ -8,26 +8,36 @@ class HeightWeightScalePage extends StatefulWidget {
 }
 
 class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
-  ScrollController _controller;
-  List<MeasurementLine> measurementLineList = List<MeasurementLine>();
+  ScrollController _heightController;
+  ScrollController _weightController;
+  List<MeasurementLine> heightMeasurementLineList = List<MeasurementLine>();
+  List<MeasurementLine> weightMeasurementLineList = List<MeasurementLine>();
   final feetController = TextEditingController();
   final inchController = TextEditingController();
-  final feetScale = 13;
+  final kilogramController = TextEditingController();
+  final heightLimitInFeet = 13;
+  final weightLimitInKg = 200;
 
   @override
   void initState() {
     super.initState();
-    _fillData();
-    _controller = ScrollController();
-    _controller.addListener(_scrollListener);
+    _fillDataForHeight();
+    _fillDataForWeight();
+    _heightController = ScrollController(initialScrollOffset: 0);
+    _heightController.addListener(_heightScrollListener);
+    _weightController = ScrollController(initialScrollOffset: 0);
+    _weightController.addListener(_weightScrollListener);
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_scrollListener);
-    _controller.dispose();
+    _heightController.removeListener(_heightScrollListener);
+    _heightController.dispose();
+    _weightController.removeListener(_weightScrollListener);
+    _weightController.dispose();
     feetController.dispose();
     inchController.dispose();
+    kilogramController.dispose();
     super.dispose();
   }
 
@@ -40,49 +50,177 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
             Expanded(
               child: Column(
                 children: <Widget>[
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Text(
-                    'Height',
-                    style: TextStyle(fontSize: 30),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        width: 100,
-                        child: TextField(
-                          controller: feetController,
-                          style: TextStyle(fontSize: 22),
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                              hintText: '0',
-                              suffixText: 'ft',
-                              border: OutlineInputBorder()),
-                          onSubmitted: _changeScale(),
+                  Expanded(
+                      child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 50,
                         ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Container(
-                        width: 100,
-                        child: TextField(
-                          controller: inchController,
-                          style: TextStyle(fontSize: 22),
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                              hintText: '0',
-                              suffixText: 'in',
-                              border: OutlineInputBorder()),
-                          onSubmitted: _changeScale(),
+                        Text(
+                          'Height',
+                          style: TextStyle(fontSize: 30),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              width: 100,
+                              child: TextField(
+                                controller: feetController,
+                                style: TextStyle(fontSize: 22),
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                    hintText: '0',
+                                    suffixText: 'ft',
+                                    border: OutlineInputBorder()),
+                                onSubmitted: _heightChangeScale(),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Container(
+                              width: 100,
+                              child: TextField(
+                                controller: inchController,
+                                style: TextStyle(fontSize: 22),
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                    hintText: '0',
+                                    suffixText: 'in',
+                                    border: OutlineInputBorder()),
+                                onSubmitted: _heightChangeScale(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 50,
+                        ),
+                        Text(
+                          'Weight',
+                          style: TextStyle(fontSize: 30),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              width: 120,
+                              child: TextField(
+                                controller: kilogramController,
+                                style: TextStyle(fontSize: 22),
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                    hintText: '0',
+                                    suffixText: 'kg',
+                                    border: OutlineInputBorder()),
+                                onSubmitted: _weightChangeScale(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                  )),
+                  Container(
+                    height: 90,
+                    decoration: BoxDecoration(color: Colors.tealAccent[200]),
+                    child: Column(
+                      children: <Widget>[
+                        RotatedBox(
+                          quarterTurns: 2,
+                          child: Image.asset(
+                            'assets/images/tooltip.png',
+                            scale: 1,
+                          ),
+                        ),
+                        Expanded(
+                            child: ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          itemCount: weightMeasurementLineList.length,
+                          scrollDirection: Axis.horizontal,
+                          controller: _weightController,
+                          padding: EdgeInsets.only(
+                              top: 5,
+                              left: MediaQuery.of(context).size.width * 0.35),
+                          itemBuilder: (context, index) {
+                            final mLine = weightMeasurementLineList[index];
+
+                            if (mLine.type == Line.big) {
+                              return Stack(
+                                alignment: AlignmentDirectional.bottomEnd,
+                                overflow: Overflow.visible,
+                                children: <Widget>[
+                                  Positioned(
+                                    left: 12,
+                                    top: 0,
+                                    child: Text(
+                                      '${mLine.value}',
+                                      style: TextStyle(fontSize: 25),
+                                    ),
+                                  ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        width: 17,
+                                      ),
+                                      Container(
+                                        width: 3,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                            color: Colors.black54),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              );
+                            } else if (weightMeasurementLineList[index].type ==
+                                Line.small) {
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  SizedBox(
+                                    width: 19,
+                                  ),
+                                  Container(
+                                    width: 1,
+                                    height: 20,
+                                    decoration:
+                                        BoxDecoration(color: Colors.blueGrey),
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  SizedBox(
+                                    width: 18,
+                                  ),
+                                  Container(
+                                    width: 2,
+                                    height: 30,
+                                    decoration:
+                                        BoxDecoration(color: Colors.black54),
+                                  ),
+                                ],
+                              );
+                            }
+                          },
+                        ))
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -107,13 +245,13 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                   Expanded(
                       child: ListView.builder(
                     physics: BouncingScrollPhysics(),
-                    controller: _controller,
-                    itemCount: measurementLineList.length,
+                    controller: _heightController,
+                    itemCount: heightMeasurementLineList.length,
                     padding: EdgeInsets.only(
                         left: 5,
                         top: MediaQuery.of(context).size.height * 0.46),
                     itemBuilder: (context, index) {
-                      final mLine = measurementLineList[index];
+                      final mLine = heightMeasurementLineList[index];
 
                       if (mLine.type == Line.big) {
                         return Stack(
@@ -144,7 +282,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                             )
                           ],
                         );
-                      } else if (measurementLineList[index].type ==
+                      } else if (heightMeasurementLineList[index].type ==
                           Line.small) {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -186,38 +324,72 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   }
 
   /// Methods
-  _scrollListener() {
-    debugPrint('${_controller.offset}');
-    _convertPixelToFeetAndInchAndReflectOnTextForm(_controller.offset.toInt());
-  }
 
-  void _fillData() {
-    for (int i = 0; i <= feetScale; i++) {
-      measurementLineList.add(MeasurementLine(type: Line.big, value: i));
+  void _fillDataForHeight() {
+    for (int i = 0; i <= heightLimitInFeet; i++) {
+      heightMeasurementLineList.add(MeasurementLine(type: Line.big, value: i));
       for (int j = 0; j <= 10; j++) {
-        measurementLineList.add(j != 5
+        heightMeasurementLineList.add(j != 5
             ? MeasurementLine(type: Line.small, value: i)
             : MeasurementLine(type: Line.medium, value: i));
       }
     }
   }
 
-  void _convertPixelToFeetAndInchAndReflectOnTextForm(int value) {
-    int inch = value ~/ 20;
-    int feet = inch ~/ 12;
-    int actualInches = inch % 12;
-    debugPrint('${feet} feet and ${actualInches} inch long');
-    feetController.text = feet.toString();
-    inchController.text = actualInches.toString();
+  void _fillDataForWeight() {
+    for (int i = 0; i <= weightLimitInKg; i++) {
+      weightMeasurementLineList.add(MeasurementLine(type: Line.big, value: i));
+      for (int j = 0; j <= 8; j++) {
+        weightMeasurementLineList.add(j != 4
+            ? MeasurementLine(type: Line.small, value: i)
+            : MeasurementLine(type: Line.medium, value: i));
+      }
+    }
   }
 
-  _changeScale() {
+  _heightScrollListener() {
+    debugPrint('${_heightController.offset}');
+    _heightConvertPixelToFeetAndInchAndReflectOnTextForm(
+        _heightController.offset.toInt());
+  }
+
+  _weightScrollListener() {
+    debugPrint('${_weightController.offset}');
+    _weightConvertPixelToKgReflectOnTextForm(_weightController.offset.toInt());
+  }
+
+  _heightConvertPixelToFeetAndInchAndReflectOnTextForm(int value) {
+    int inchOffest = value ~/ 20;
+    int feet = inchOffest ~/ 12;
+    int inch = inchOffest % 12;
+    debugPrint('${feet} feet and ${inch} inch long');
+    feetController.text = feet.toString();
+    inchController.text = inch.toString();
+  }
+
+  _weightConvertPixelToKgReflectOnTextForm(int value) {
+    int gram = value ~/ 20;
+    double kg = ((gram * 100) / 1000);
+    kilogramController.text = kg.toString();
+  }
+
+  _heightChangeScale() {
     double moveToFeet = double.tryParse(feetController.text) ?? 0;
     double moveToInch = double.tryParse(inchController.text) ?? 0;
     double moveToPixel = moveToFeet * 240 + moveToInch * 20;
     debugPrint('$moveToPixel');
-    if (_controller.hasClients) {
-      _controller.animateTo(moveToPixel,
+    if (_heightController.hasClients) {
+      _heightController.animateTo(moveToPixel,
+          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
+    }
+  }
+
+  _weightChangeScale() {
+    double moveToFeet = double.tryParse(kilogramController.text) ?? 0;
+    double moveToPixel = moveToFeet / 0.1 * 20;
+    debugPrint('$moveToPixel');
+    if (_weightController.hasClients) {
+      _weightController.animateTo(moveToPixel,
           duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
     }
   }
