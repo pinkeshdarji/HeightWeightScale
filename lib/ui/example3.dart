@@ -198,7 +198,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     }
   }
 
-  void _handleWeightScaleChanged(int scalePoints) {
+  void _handleWeightScaleChanged(int scalePoints)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {
     int gram = scalePoints ~/ 20;
     double kg = ((gram * 100) / 1000);
     kilogramController.text = kg.toString();
