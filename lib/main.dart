@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:height_weight_scale/ui/height_weight_scale.dart';
+import 'package:height_weight_scale/ui/example3.dart';
 
 void main() => runApp(HeightWeightScaleDemo());
 
