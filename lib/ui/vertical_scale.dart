@@ -12,18 +12,20 @@ class VerticalScale extends StatefulWidget {
   final TextStyle textStyle;
   final int linesBetweenTwoPoints;
   final int middleLineAt;
+  final Widget pointer;
 
-  const VerticalScale({
-    Key key,
-    @required this.maxValue,
-    @required this.scaleController,
-    this.onChanged,
-    this.scaleColor = Colors.tealAccent,
-    this.lineColor = Colors.black54,
-    this.textStyle = const TextStyle(fontSize: 25, color: Colors.black54),
-    this.linesBetweenTwoPoints = 9,
-    this.middleLineAt = 5,
-  })  : assert(maxValue != null,
+  const VerticalScale(
+      {Key key,
+      @required this.maxValue,
+      @required this.scaleController,
+      this.onChanged,
+      this.scaleColor = Colors.tealAccent,
+      this.lineColor = Colors.black54,
+      this.textStyle = const TextStyle(fontSize: 25, color: Colors.black54),
+      this.linesBetweenTwoPoints = 9,
+      this.middleLineAt = 5,
+      this.pointer})
+      : assert(maxValue != null,
             "maxValue cannot be null. This is used to set scale limit. i.e maxValue=10"),
         assert(scaleController != null,
             "scaleController cannot be null. This is used to control the behaviour of scale like reading current scale point, move to particular point in scale etc. Try giving value like scaleController: ScrollController(initialScrollOffset: 0)"),
@@ -55,22 +57,20 @@ class _VerticalScaleState extends State<VerticalScale> {
     return Container(
       width: 90,
       decoration: BoxDecoration(color: widget.scaleColor),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: <Widget>[
           Container(
-            margin:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.46),
-            child: RotatedBox(
-              quarterTurns: 1,
-              child: Image.asset(
-                'assets/images/tooltip.png',
-                scale: 1,
-              ),
-            ),
+            margin: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 0.46 + 17),
+            child: widget.pointer ??
+                Container(
+                  height: 3,
+                  width: 90,
+                  decoration:
+                      BoxDecoration(color: Colors.redAccent.withOpacity(0.7)),
+                ),
           ),
-          Expanded(
-              child: ListView.builder(
+          ListView.builder(
             physics: BouncingScrollPhysics(),
             controller: widget.scaleController,
             itemCount: measurementLineList.length,
@@ -84,8 +84,8 @@ class _VerticalScaleState extends State<VerticalScale> {
                   overflow: Overflow.visible,
                   children: <Widget>[
                     Positioned(
-                      top: 4,
-                      left: 0,
+                      top: 5,
+                      left: 15,
                       child: Text(
                         '${mLine.value}',
                         style: widget.textStyle,
@@ -99,7 +99,7 @@ class _VerticalScaleState extends State<VerticalScale> {
                         ),
                         Container(
                           height: 3,
-                          width: 30,
+                          width: 40,
                           decoration: BoxDecoration(color: widget.lineColor),
                         ),
                       ],
@@ -129,14 +129,14 @@ class _VerticalScaleState extends State<VerticalScale> {
                     ),
                     Container(
                       height: 2,
-                      width: 30,
+                      width: 27,
                       decoration: BoxDecoration(color: widget.lineColor),
                     ),
                   ],
                 );
               }
             },
-          ))
+          )
         ],
       ),
     );
