@@ -1,38 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:height_weight_scale/model/measurement_line.dart';
 
-typedef void ScaleChangedCallback(int feet, int inch);
+typedef void ScaleChangedCallback(int scalePoints);
 
-class HeightScale extends StatefulWidget {
-  final int heightLimitInFeet;
-  final ScrollController heightController;
+class VerticalScale extends StatefulWidget {
+  final int maxValue;
+  final ScrollController scaleController;
   final ScaleChangedCallback onChanged;
+  final Color scaleColor;
+  final Color lineColor;
+  final TextStyle textStyle;
+  final int linesBetweenTwoPoints;
+  final int middleLineAt;
 
-  const HeightScale({
+  const VerticalScale({
     Key key,
-    @required this.heightLimitInFeet,
-    @required this.heightController,
-    @required this.onChanged,
-  }) : super(key: key);
+    @required this.maxValue,
+    @required this.scaleController,
+    this.onChanged,
+    this.scaleColor = Colors.tealAccent,
+    this.lineColor = Colors.black54,
+    this.textStyle = const TextStyle(fontSize: 25, color: Colors.black54),
+    this.linesBetweenTwoPoints = 9,
+    this.middleLineAt = 5,
+  })  : assert(maxValue != null,
+            "maxValue cannot be null. This is used to set scale limit. i.e maxValue=10"),
+        assert(scaleController != null,
+            "scaleController cannot be null. This is used to control the behaviour of scale like reading current scale point, move to particular point in scale etc. Try giving value like scaleController: ScrollController(initialScrollOffset: 0)"),
+        super(key: key);
 
   @override
-  _HeightScaleState createState() => _HeightScaleState();
+  _VerticalScaleState createState() => _VerticalScaleState();
 }
 
-class _HeightScaleState extends State<HeightScale> {
-  List<MeasurementLine> heightMeasurementLineList = List<MeasurementLine>();
+class _VerticalScaleState extends State<VerticalScale> {
+  List<MeasurementLine> measurementLineList = List<MeasurementLine>();
 
   @override
   void initState() {
     super.initState();
-    _fillDataForHeight();
-    widget.heightController.addListener(_heightScrollListener);
+    _createListOfLinesToDraw();
+    widget.scaleController.addListener(_scaleScrollListener);
   }
 
   @override
   void dispose() {
-    widget.heightController.removeListener(_heightScrollListener);
-    widget.heightController.dispose();
+    widget.scaleController.removeListener(_scaleScrollListener);
+    widget.scaleController.dispose();
     super.dispose();
   }
 
@@ -40,7 +54,7 @@ class _HeightScaleState extends State<HeightScale> {
   Widget build(BuildContext context) {
     return Container(
       width: 90,
-      decoration: BoxDecoration(color: Colors.tealAccent[200]),
+      decoration: BoxDecoration(color: widget.scaleColor),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -58,12 +72,12 @@ class _HeightScaleState extends State<HeightScale> {
           Expanded(
               child: ListView.builder(
             physics: BouncingScrollPhysics(),
-            controller: widget.heightController,
-            itemCount: heightMeasurementLineList.length,
+            controller: widget.scaleController,
+            itemCount: measurementLineList.length,
             padding: EdgeInsets.only(
                 left: 5, top: MediaQuery.of(context).size.height * 0.46),
             itemBuilder: (context, index) {
-              final mLine = heightMeasurementLineList[index];
+              final mLine = measurementLineList[index];
               if (mLine.type == Line.big) {
                 return Stack(
                   alignment: AlignmentDirectional.bottomEnd,
@@ -74,7 +88,7 @@ class _HeightScaleState extends State<HeightScale> {
                       left: 0,
                       child: Text(
                         '${mLine.value}',
-                        style: TextStyle(fontSize: 25),
+                        style: widget.textStyle,
                       ),
                     ),
                     Column(
@@ -86,13 +100,13 @@ class _HeightScaleState extends State<HeightScale> {
                         Container(
                           height: 3,
                           width: 30,
-                          decoration: BoxDecoration(color: Colors.black54),
+                          decoration: BoxDecoration(color: widget.lineColor),
                         ),
                       ],
                     )
                   ],
                 );
-              } else if (heightMeasurementLineList[index].type == Line.small) {
+              } else if (measurementLineList[index].type == Line.small) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
@@ -102,7 +116,7 @@ class _HeightScaleState extends State<HeightScale> {
                     Container(
                       height: 1,
                       width: 20,
-                      decoration: BoxDecoration(color: Colors.blueGrey),
+                      decoration: BoxDecoration(color: widget.lineColor),
                     ),
                   ],
                 );
@@ -116,7 +130,7 @@ class _HeightScaleState extends State<HeightScale> {
                     Container(
                       height: 2,
                       width: 30,
-                      decoration: BoxDecoration(color: Colors.black54),
+                      decoration: BoxDecoration(color: widget.lineColor),
                     ),
                   ],
                 );
@@ -128,36 +142,18 @@ class _HeightScaleState extends State<HeightScale> {
     );
   }
 
-  void _fillDataForHeight() {
-    for (int i = 0; i <= widget.heightLimitInFeet; i++) {
-      heightMeasurementLineList.add(MeasurementLine(type: Line.big, value: i));
-      for (int j = 0; j <= 10; j++) {
-        heightMeasurementLineList.add(j != 5
+  void _createListOfLinesToDraw() {
+    for (int i = 0; i <= widget.maxValue; i++) {
+      measurementLineList.add(MeasurementLine(type: Line.big, value: i));
+      for (int j = 1; j <= widget.linesBetweenTwoPoints; j++) {
+        measurementLineList.add(j != widget.middleLineAt
             ? MeasurementLine(type: Line.small, value: i)
             : MeasurementLine(type: Line.medium, value: i));
       }
     }
   }
 
-  _heightScrollListener() {
-    debugPrint('${widget.heightController.offset}');
-    _heightConvertPixelToFeetAndInchAndReflectOnTextForm(
-        widget.heightController.offset.toInt());
+  _scaleScrollListener() {
+    widget.onChanged(widget.scaleController.offset.toInt());
   }
-
-  _heightConvertPixelToFeetAndInchAndReflectOnTextForm(int value) {
-    int inchOffest = value ~/ 20;
-    int feet = inchOffest ~/ 12;
-    int inch = inchOffest % 12;
-    debugPrint('${feet} feet and ${inch} inch long');
-    widget.onChanged(feet, inch);
-  }
-
-//  _moveScaleTo() {
-//    double moveToPixel = widget.feet * 240 + widget.inch * 20;
-//    if (widget.heightController.hasClients) {
-//      widget.heightController.animateTo(moveToPixel,
-//          duration: Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
-//    }
-//  }
 }

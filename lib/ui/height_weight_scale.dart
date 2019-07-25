@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:height_weight_scale/model/measurement_line.dart';
 
-import 'height_scale.dart';
+import 'vertical_scale.dart';
 
 class HeightWeightScalePage extends StatefulWidget {
   @override
@@ -228,9 +228,17 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
                 ],
               ),
             ),
-            HeightScale(
-              heightLimitInFeet: 15,
-              heightController: _heightController,
+            VerticalScale(
+              maxValue: 13,
+              scaleController: _heightController,
+              scaleColor: Colors.amberAccent,
+              lineColor: Colors.purple,
+              linesBetweenTwoPoints: 11,
+              middleLineAt: 6,
+              textStyle: TextStyle(
+                  fontSize: 22,
+                  color: Colors.purple,
+                  fontWeight: FontWeight.bold),
               onChanged: _handleHeightScaleChanged,
             ),
           ],
@@ -240,7 +248,6 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   }
 
   /// Methods
-
   void _fillDataForWeight() {
     for (int i = 0; i <= weightLimitInKg; i++) {
       weightMeasurementLineList.add(MeasurementLine(type: Line.big, value: i));
@@ -284,8 +291,11 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     }
   }
 
-  void _handleHeightScaleChanged(int feet, int inch) {
-    debugPrint('hi');
+  void _handleHeightScaleChanged(int scalePoints) {
+    int inchOffest = scalePoints ~/ 20;
+    int feet = inchOffest ~/ 12;
+    int inch = inchOffest % 12;
+    debugPrint('${feet} feet and ${inch} inch long');
     setState(() {
       feetController.text = feet.toString();
       inchController.text = inch.toString();
