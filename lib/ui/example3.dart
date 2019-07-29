@@ -4,12 +4,12 @@ import 'package:flutter/rendering.dart';
 import 'horizontalScale.dart';
 import 'vertical_scale.dart';
 
-class HeightWeightScalePage extends StatefulWidget {
+class Example3 extends StatefulWidget {
   @override
-  _HeightWeightScalePageState createState() => _HeightWeightScalePageState();
+  _Example3State createState() => _Example3State();
 }
 
-class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
+class _Example3State extends State<Example3> {
   ScrollController _weightController;
   ScrollController _heightController;
 
@@ -166,7 +166,8 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     double feetToInch = feet * 12;
 
     /// scale only understands scale points.
-    /// So we need to convert our measurement into scale points by multiplying our measurement unit with 20.
+    /// So we need to convert our measurement into scale points by multiplying our measurement unit with 20
+    /// i.e scale points = measurement unit * 20.
     /// inches * 20 to get actual scale point. NOTE: 20 is the actual distance between two lines.
     double inchToScalePoints = feetToInch * 20 + inch * 20;
 
@@ -179,6 +180,7 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   void _handleHeightScaleChanged(int scalePoints) {
     /// scale only understands scale points.
     /// So we need to convert scale points into our measurement unit by dividing scale point with 20.
+    ///  i.e measurement unit = scale point / 20.
     int inchOffest = scalePoints ~/ 20;
     int feet = inchOffest ~/ 12;
     int inch = inchOffest % 12;
@@ -190,7 +192,8 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
   ///Weight related methods
   _setWeight() {
     double moveToFeet = double.tryParse(kilogramController.text) ?? 0;
-    double moveToPixel = moveToFeet / 0.1 * 20;
+    double moveToPixel =
+        moveToFeet / 0.1 * 20; //scale points = measurement unit * 20.
 
     if (_weightController.hasClients) {
       _weightController.animateTo(moveToPixel,
@@ -198,8 +201,8 @@ class _HeightWeightScalePageState extends State<HeightWeightScalePage> {
     }
   }
 
-  void _handleWeightScaleChanged(int scalePoints)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {
-    int gram = scalePoints ~/ 20;
+  void _handleWeightScaleChanged(int scalePoints) {
+    int gram = scalePoints ~/ 20; //measurement unit = scale point / 20.
     double kg = ((gram * 100) / 1000);
     kilogramController.text = kg.toString();
   }
