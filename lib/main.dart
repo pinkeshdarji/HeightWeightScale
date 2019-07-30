@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:height_weight_scale/ui/example1.dart';
+import 'package:height_weight_scale/ui/example3.dart';
 
 void main() => runApp(HeightWeightScaleDemo());
 
@@ -12,6 +12,6 @@ class HeightWeightScaleDemo extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
             primarySwatch: Colors.blueGrey, accentColor: Colors.tealAccent),
-        home: SafeArea(child: Example1()));
+        home: SafeArea(child: Example3()));
   }
 }

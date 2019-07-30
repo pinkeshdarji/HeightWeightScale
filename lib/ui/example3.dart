@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'horizontalScale.dart';
+import 'horizontal_scale.dart';
 import 'vertical_scale.dart';
 
 class Example3 extends StatefulWidget {

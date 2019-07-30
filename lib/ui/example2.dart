@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'horizontalScale.dart';
+import 'horizontal_scale.dart';
 
 class Example2 extends StatefulWidget {
   @override
